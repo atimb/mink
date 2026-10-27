@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#111413">
+  <title>MINK — Attila Incze</title>
+  <link rel="stylesheet" href="style.css">
+  <script defer src="assets.js"></script>
+  <script defer src="core.js"></script>
+  <script defer src="renderer.js"></script>
+  <script defer src="app.js"></script>
+</head>
+<body>
+  <main>
+    <header class="masthead">
+      <div class="identity"><span class="brand">MINK<span class="dot">.</span></span><span class="byline">ATTILA INCZE<br>THE ORIGINAL ARENA / WEB EDITION</span></div>
+      <div class="header-actions"><span id="status" role="status">READY TO PLAY</span><button id="fullscreen" title="Fullscreen (F)">FULLSCREEN <span aria-hidden="true">↗</span></button></div>
+    </header>
+    <section id="cabinet" aria-label="Mink game">
+      <div class="frame-label"><span>01 / DEATHMATCH</span><span>320 × 200 / ORIGINAL PIXELS</span></div>
+      <div id="stage">
+        <canvas id="game" width="320" height="200" tabindex="0" aria-label="Mink deathmatch arena. Use W and S to move relative to aim, A and D to strafe, mouse to aim and fire. Escape pauses."></canvas>
+        <div id="overlay">
+          <section id="menu" class="menu-card" aria-labelledby="menu-title">
+            <p class="eyebrow">MINK V1.00 / SINGLE PLAYER</p>
+            <h1 id="menu-title">BACK IN<br>THE ARENA<span>.</span></h1>
+            <p class="menu-copy">Same pixels. Same battleground.<br>One more round.</p>
+            <form id="start-form">
+              <label for="bots">OPPONENTS <output id="bot-value" for="bots">10 BOTS</output></label>
+              <input id="bots" type="range" min="1" max="19" value="10" aria-label="Number of bot opponents">
+              <button class="primary" type="submit">START GAME <span aria-hidden="true">→</span></button>
+            </form>
+            <button id="resume" class="primary" hidden>RESUME GAME <span aria-hidden="true">→</span></button>
+            <button id="new-match" class="secondary" hidden>NEW MATCH</button>
+            <div class="menu-controls"><span><b>W S</b> FORWARD / BACK</span><span><b>A D</b> STRAFE</span><span><b>MOUSE</b> AIM + FIRE</span><span><b>1–6</b> WEAPONS</span></div>
+          </section>
+        </div>
+        <div id="scoreboard" hidden aria-label="Scoreboard"><h2>THE ARENA</h2><div class="score-head"><span>PLAYER</span><span>KILLS</span><span>DEATHS</span><span>FRAGS</span></div><div id="score-rows"></div></div>
+      </div>
+      <div class="weapon-bar" aria-label="Weapon inventory" id="weapons"></div>
+      <div class="console-line"><span id="readout">ORIGINAL LEVEL 01 / 10 BOTS</span><span id="hint">WASD + MOUSE / ESC PAUSE / TAB SCORES</span><button id="pause" disabled>PAUSE <span aria-hidden="true">Ⅱ</span></button></div>
+    </section>
+    <footer><span>ORIGINAL ART &amp; GAME BY ATTILA INCZE</span></footer>
+    <p id="small-screen">A keyboard and mouse are required. Use a larger window for the original pixel scale.</p>
+    <noscript>This game needs JavaScript enabled.</noscript>
+  </main>
+</body>
+</html>
