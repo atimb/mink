@@ -48,6 +48,7 @@
       this.canvas=canvas;this.ctx=canvas.getContext('2d',{alpha:false});this.ctx.imageSmoothingEnabled=false;
       this.assets=assets;this.palette=defaultPalette();this.frame=new Uint8Array(WIDTH*HEIGHT);
       this.image=this.ctx.createImageData(WIDTH,HEIGHT);this.cache=new Map();
+      this.width=WIDTH;this.height=HEIGHT;
       const level=assets.level;this.worldWidth=level.width*20;this.worldHeight=level.height*20;
       this.world=new Uint8Array(this.worldWidth*this.worldHeight);
       const under=assets.sprites['bg'+level.layers[1][0]];
@@ -60,6 +61,12 @@
       }
       for(let frame=1;frame<=4;frame++)for(let d=0;d<8;d++)this.rotated(`man${frame}`,d);
       for(let d=0;d<8;d++)this.rotated('rck1',d);
+    }
+    resize(width,height) {
+      if(this.width===width&&this.height===height)return;
+      this.width=width;this.height=height;this.canvas.width=width;this.canvas.height=height;
+      this.ctx.imageSmoothingEnabled=false;
+      this.frame=new Uint8Array(width*height);this.image=this.ctx.createImageData(width,height);
     }
     rotated(name,dir) {
       const key=name+':'+dir;
@@ -77,6 +84,7 @@
       this.cache.set(key,result);return result;
     }
     sprite(name,x,y,color=0,rotation=null) {
+      const WIDTH=this.width,HEIGHT=this.height;
       const sprite=rotation===null?this.assets.sprites[name]:this.rotated(name,rotation);
       if(!sprite)return;
       x=round(x);y=round(y);
@@ -91,6 +99,7 @@
       }
     }
     rect(x,y,w,h,color) {
+      const WIDTH=this.width,HEIGHT=this.height;
       for(let j=Math.max(0,y);j<Math.min(HEIGHT,y+h);j++)this.frame.fill(color,j*WIDTH+Math.max(0,x),j*WIDTH+Math.min(WIDTH,x+w));
     }
     text(text,x,y,color=15,scale=1) {
@@ -107,7 +116,8 @@
         else this.sprite('n'+digits[i],x+i*4,y);
       }
     }
-    render(game,{crosshair={x:160,y:100},hud=true}={}) {
+    render(game,{crosshair={x:160,y:100},hud=true,mobile=false}={}) {
+      const WIDTH=this.width,HEIGHT=this.height;
       const cx=game.camera.x,cy=game.camera.y;
       for(let y=0;y<HEIGHT;y++) {
         const offset=(cy+y)*this.worldWidth+cx;
@@ -139,15 +149,18 @@
       for(const r of game.rockets)draw('rck1',r.x-4,r.y-4,0,((round(r.dir/(TAU/8))%8)+8)%8);
       if(hud) {
         // Original HUD positions: frags left, ammo center, health right.
-        this.number(game.player.score,1,1);
-        this.number(game.player.ammo[game.player.weapon],155,1);
-        this.number(game.player.health,308,1);
-        this.sprite(game.player.dead?'cross2':'cross1',clamp(round(crosshair.x),2,317)-2,clamp(round(crosshair.y),2,197)-2);
-        if(game.player.dead) {
-          this.rect(95,86,130,23,0);this.text('RESPAWNING',132,90,15);
-          this.text((Math.max(0,100-game.player.deathTicks)/70).toFixed(1)+' SECONDS',137,100,7);
+        if(!mobile) {
+          this.number(game.player.score,1,1);
+          this.number(game.player.ammo[game.player.weapon],155,1);
+          this.number(game.player.health,308,1);
         }
-        if(game.noticeTicks>0){this.rect(2,187,Math.min(240,game.notice.length*5+4),9,0);this.text(game.notice,4,189,15);}
+        this.sprite(game.player.dead?'cross2':'cross1',clamp(round(crosshair.x),2,WIDTH-3)-2,clamp(round(crosshair.y),2,HEIGHT-3)-2);
+        if(game.player.dead) {
+          const ox=mobile?Math.floor((WIDTH-320)/2):0,oy=mobile?Math.floor((HEIGHT-200)/2):0;
+          this.rect(95+ox,86+oy,130,23,0);this.text('RESPAWNING',132+ox,90+oy,15);
+          this.text((Math.max(0,100-game.player.deathTicks)/70).toFixed(1)+' SECONDS',137+ox,100+oy,7);
+        }
+        if(game.noticeTicks>0&&!mobile){this.rect(2,187,Math.min(240,game.notice.length*5+4),9,0);this.text(game.notice,4,189,15);}
       }
       this.present(game.flash);
     }

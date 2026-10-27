@@ -11,15 +11,20 @@ test('original assets: dimensions, untouched data checksums, map and byte orient
   assert.equal(Object.keys(assets.sprites).length,68);
   assert.deepEqual([assets.level.width,assets.level.height],[32,20]);
   assert.equal(assets.level.layers.length,3);
-  const manifest=require('../original-data/manifest.json');assert.equal(manifest.length,76);
-  for(const entry of manifest){
-    const data=fs.readFileSync(path.join(__dirname,'../original-data',entry.file));
-    assert.equal(data.length,entry.bytes);
-    assert.equal(crypto.createHash('sha256').update(data).digest('hex'),entry.sha256);
+  // The checked-out repository ships the complete bundle, not the optional DAT archive.
+  assert.equal(crypto.createHash('sha256').update(JSON.stringify(assets)).digest('hex'),
+    '02b0579b314173bb2e605818f06c63cc500373f02189d259ef630e131373b5e1');
+  if(fs.existsSync(path.join(__dirname,'../original-data/manifest.json'))){
+    const manifest=require('../original-data/manifest.json');assert.equal(manifest.length,76);
+    for(const entry of manifest){
+      const data=fs.readFileSync(path.join(__dirname,'../original-data',entry.file));
+      assert.equal(data.length,entry.bytes);
+      assert.equal(crypto.createHash('sha256').update(data).digest('hex'),entry.sha256);
+    }
+    const data=fs.readFileSync(path.join(__dirname,'../original-data/MAN1.DAT'));
+    const offset=Buffer.from('100\r\n20\r\n20\r\n').length;
+    for(let x=0;x<20;x++)for(let y=0;y<20;y++)assert.equal(assets.sprites.man1.pixels[y*20+x],data[offset+x*22+y]);
   }
-  const data=fs.readFileSync(path.join(__dirname,'../original-data/MAN1.DAT'));
-  const offset=Buffer.from('100\r\n20\r\n20\r\n').length;
-  for(let x=0;x<20;x++)for(let y=0;y<20;y++)assert.equal(assets.sprites.man1.pixels[y*20+x],data[offset+x*22+y]);
   assert(assets.level.layers[0].every(t=>t>=1&&t<=11));
   assert(assets.level.layers[2].some(t=>t===5));
 });

@@ -2,13 +2,15 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="theme-color" content="#111413">
   <title>MINK — Attila Incze</title>
   <link rel="stylesheet" href="style.css">
   <script defer src="assets.js"></script>
   <script defer src="core.js"></script>
   <script defer src="renderer.js"></script>
+  <script defer src="touch.js"></script>
   <script defer src="app.js"></script>
 </head>
 <body>
@@ -37,6 +39,18 @@
           </section>
         </div>
         <div id="scoreboard" hidden aria-label="Scoreboard"><h2>THE ARENA</h2><div class="score-head"><span>PLAYER</span><span>KILLS</span><span>DEATHS</span><span>FRAGS</span></div><div id="score-rows"></div></div>
+        <div id="touch-controls" hidden>
+          <div class="touch-hud">
+            <div class="touch-stats"><span>HEALTH <b id="touch-health">100</b></span><span>FRAGS <b id="touch-score">0</b></span></div>
+            <button id="touch-weapon" aria-label="Switch weapon"><span id="touch-weapon-name">SIDEARM</span><span id="touch-ammo">30 RDS</span><span aria-hidden="true">↻</span></button>
+          </div>
+          <div id="move-stick" class="touch-stick" role="group" aria-label="Movement joystick: drag to move">
+            <span class="stick-knob"></span><span class="stick-label">MOVE</span>
+          </div>
+          <div id="fire-stick" class="touch-stick" role="group" aria-label="Aim and fire joystick: hold to fire, drag to aim">
+            <span class="stick-knob"></span><span class="stick-label">AIM / FIRE</span>
+          </div>
+        </div>
       </div>
       <div class="weapon-bar" aria-label="Weapon inventory" id="weapons"></div>
       <div class="console-line"><span id="readout">ORIGINAL LEVEL 01 / 10 BOTS</span><span id="hint">WASD + MOUSE / ESC PAUSE / TAB SCORES</span><button id="pause" disabled>PAUSE <span aria-hidden="true">Ⅱ</span></button></div>

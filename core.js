@@ -21,9 +21,14 @@
     {name:'BEAM',delay:2,damage:7,pellets:20,spread:0}
   ];
   class Camera {
-    constructor(w,h) {this.width=w;this.height=h;this.x=0;this.y=0;this.dx=0;this.dy=0;}
+    constructor(w,h) {this.width=w;this.height=h;this.viewWidth=WIDTH;this.viewHeight=HEIGHT;this.x=0;this.y=0;this.dx=0;this.dy=0;}
+    setViewport(width,height,p) {
+      this.viewWidth=clamp(Math.round(width),1,this.width);
+      this.viewHeight=clamp(Math.round(height),1,this.height);
+      this.center(p);
+    }
     update(p) {
-      const tx=round((round(p.x)-150)/4)*4, ty=round((round(p.y)-90)/4)*4;
+      const tx=round((round(p.x)-(this.viewWidth/2-10))/4)*4, ty=round((round(p.y)-(this.viewHeight/2-10))/4)*4;
       if(tx>this.x+28)this.dx=1;
       if(tx<this.x-28)this.dx=-1;
       if(ty>this.y+20)this.dy=1;
@@ -36,15 +41,15 @@
         this.y+=4*this.dy;
         if((this.dy===1&&this.y>ty+8)||(this.dy===-1&&this.y<ty-8))this.dy=0;
       }
-      const x=clamp(this.x,0,Math.max(0,this.width-WIDTH));
-      const y=clamp(this.y,0,Math.max(0,this.height-HEIGHT));
+      const x=clamp(this.x,0,Math.max(0,this.width-this.viewWidth));
+      const y=clamp(this.y,0,Math.max(0,this.height-this.viewHeight));
       if(x!==this.x)this.dx=0;
       if(y!==this.y)this.dy=0;
       this.x=x;this.y=y;
     }
     center(p) {
-      this.x=clamp(round((p.x-150)/4)*4,0,Math.max(0,this.width-WIDTH));
-      this.y=clamp(round((p.y-90)/4)*4,0,Math.max(0,this.height-HEIGHT));
+      this.x=clamp(round((p.x-(this.viewWidth/2-10))/4)*4,0,Math.max(0,this.width-this.viewWidth));
+      this.y=clamp(round((p.y-(this.viewHeight/2-10))/4)*4,0,Math.max(0,this.height-this.viewHeight));
       this.dx=this.dy=0;
     }
   }
@@ -218,8 +223,10 @@
         if(a.dead){this.respawn(a);continue;}
         for(let w=1;w<=6;w++)if(a.cooldowns[w]>0)a.cooldowns[w]--;
         let forward=0,strafe=0,trigger=false;
+        const touchMovement=a.id===0&&Number.isFinite(input.moveX)&&Number.isFinite(input.moveY);
         if(a.id===0) {
-          if(Number.isFinite(input.aimX)&&Number.isFinite(input.aimY))a.dir=direction({x:a.x+10.5,y:a.y+10.5},{x:input.aimX+this.camera.x,y:input.aimY+this.camera.y});
+          if(Number.isFinite(input.aimDir))a.dir=input.aimDir;
+          else if(Number.isFinite(input.aimX)&&Number.isFinite(input.aimY))a.dir=direction({x:a.x+10.5,y:a.y+10.5},{x:input.aimX+this.camera.x,y:input.aimY+this.camera.y});
           forward=(input.forward?1:0)-(input.back?1:0);strafe=(input.right?1:0)-(input.left?1:0);
           if(input.weapon)this.switchWeapon(a,input.weapon);
           trigger=!!input.fire;
@@ -232,9 +239,14 @@
           forward=1;trigger=true;
         }
         const v=vector(a.dir);
-        if(forward||strafe) {
-          this.move(a,v.x*forward,v.y*forward);
-          this.move(a,Math.cos(a.dir)*strafe,Math.sin(a.dir)*strafe);
+        if(forward||strafe||(touchMovement&&(input.moveX||input.moveY))) {
+          if(touchMovement) {
+            const length=Math.max(1,Math.hypot(input.moveX,input.moveY));
+            this.move(a,input.moveX/length,input.moveY/length);
+          } else {
+            this.move(a,v.x*forward,v.y*forward);
+            this.move(a,Math.cos(a.dir)*strafe,Math.sin(a.dir)*strafe);
+          }
           if(++a.walk>10){a.walk=0;a.frame=(a.frame-1+(forward<0?-1:1)+4)%4+1;}
         }
         this.collect(a);
