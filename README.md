@@ -72,7 +72,7 @@ on death and automatically respawn.
 - Aim-relative movement, weapon spread/damage/ammo, hitscan bullets, moving
   rockets, blast damage, health, scoring, dropped bags, and original effect sprites.
 - Simple bots: move forward, fire, periodically turn toward the nearest opponent.
-- Initial sidearm with 30 rounds.
+- Initial pistol with 30 rounds.
 - The original has no sound calls in the main game; this port is also silent.
 
 ## Deliberate fixes and implementation differences
@@ -89,15 +89,20 @@ The original executable has not been run as a visual/timing reference yet.
   camera rules. This avoids starting with the player offscreen.
 - Spawn bounds use the correct level height, reject occupied/walled tiles, and
   have bounded retries. The Pascal routine used the level width for both axes.
-- Respawns give the same sidearm and 30 rounds as the initial spawn, for humans
+- Respawns give the same pistol and 30 rounds as the initial spawn, for humans
   and bots. The Pascal code's slot 6 / 10,000-round respawn loadout caused the
   arena to escalate into instant-kill rapid fire after deaths; it is corrected here.
 - Array limits, ray bounds, negative scores, last-round weapon selection, and
   uninitialized variables are handled safely rather than reproducing memory bugs.
 - Pickup respawns take 1,000 simulation ticks (about 14 seconds). This corresponds
   to the old 20-slot scan advancing its 20,000 counter; the new timer is explicit.
-- Weapon labels are descriptive names inferred from behavior; the Pascal source
-  identifies them by number. Original bullets remain invisible hitscan rays.
+- Weapon names are Pistol, MP-5, Minigun, Rocket Launcher, Shotgun, and Double
+  Shotgun, as specified by the original author. Bullets remain invisible hitscan rays.
+- Weapon 6 follows `Minkv1/MINKMAIN.PAS` (the subsequently supplied source):
+  20 pellets, ten spread offsets from -0.5 to +0.4 radians, a 79-tick firing
+  interval (about 1.13 seconds), seven damage per pellet, and 10 rounds per pickup.
+  Weapons 1–5 retain their existing port timings for this playtest; their known
+  one-tick cooldown translation difference has not been changed in this update.
 - Menu, bot selector, pause/focus handling, fullscreen, weapon bar and scoreboard
   are new browser conveniences. The simulation pauses while the pause menu is open.
 

@@ -65,6 +65,22 @@ test('all six weapons fire, consume ammo and respect cooldowns; hitscan stops at
   const game=new Game(level,1,3);place(game,game.player,100,100);place(game,game.actors[1],180,100);
   game.player.dir=Math.PI/2;game.fire(game.player);assert.equal(game.actors[1].health,100);
 });
+test('double shotgun matches root Pascal source: 20 pellets, discrete wide spread, 79-tick interval and 10-round pickups',()=>{
+  const level=arena();level.layers[2][5*32+5]=7;
+  const game=new Game(level,0,9),p=game.player;place(game,p,100,100);game.collect(p);
+  assert.equal(p.weapon,6);assert.equal(p.ammo[6],10);
+  const angles=[];
+  game.trace=(x,y,dir)=>{angles.push(dir);return {x,y,actor:null};};
+  // Cycle through every possible Random(10) value, so exact spread endpoints and steps are checked.
+  let r=0;game.random=n=>(r++%10)+0.25;
+  p.dir=0;
+  assert(game.fire(p));assert.equal(p.ammo[6],9);assert.equal(angles.length,20);
+  for(let i=0;i<20;i++)assert(Math.abs(angles[i]-((i%10)/10-0.5))<1e-12);
+  place(game,p,300,300); // Do not collect the respawning map item during the interval check.
+  for(let i=0;i<78;i++)game.step({fire:true,aimDir:0});
+  assert.equal(angles.length,20);assert.equal(p.ammo[6],9);
+  game.step({fire:true,aimDir:0});assert.equal(angles.length,40);assert.equal(p.ammo[6],8);
+});
 test('pickup locations retained, ammo collection, timed reappearance, health cap',()=>{
   const level=arena();level.layers[2][5*32+5]=5;level.layers[2][5*32+6]=1;
   const game=new Game(level,0,4),p=game.player;place(game,p,100,100);game.collect(p);

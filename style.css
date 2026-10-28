@@ -11,7 +11,7 @@ button:hover { border-color:var(--acid); color:var(--acid); }
 button:focus-visible,input:focus-visible,canvas:focus-visible { outline:2px solid var(--acid); outline-offset:3px; }
 button:disabled { opacity:.45; cursor:default; }
 [hidden] { display:none!important; }
-main { width:calc(320px * var(--scale) + 2px); margin:0 auto; }
+main { width:calc(320px * var(--scale) + 2px); margin:0 auto; container-type:inline-size; }
 .masthead { height:91px; display:flex; align-items:center; justify-content:space-between; gap:16px; }
 .identity { display:flex; align-items:center; gap:19px; }
 .brand { font-size:40px; letter-spacing:-3px; font-weight:900; line-height:1; }
@@ -87,6 +87,14 @@ footer { display:flex; justify-content:space-between; color:var(--muted); font-s
   .score-head { font-size:12px; } .score-row { font-size:14px; }
 }
 @media(max-height:700px) { .masthead { height:64px; } footer { padding:10px 0; } }
+/* Longer weapon names must also fit when the desktop game is scaled to 1x. */
+@container (max-width:639px) {
+  .byline, #status, #hint { display:none; }
+  .weapon-bar { grid-template-columns:repeat(3,minmax(0,1fr)); }
+  .weapon { border-bottom:1px solid var(--line); }
+  .weapon:nth-child(3) { border-right:0; }
+  .frame-label { flex-wrap:wrap; }
+}
 
 /* Touch mode is opt-in by device capability; desktop rules above stay intact. */
 .mobile, .mobile body { width:100%; height:100%; margin:0; overflow:hidden; overscroll-behavior:none; }

@@ -13,12 +13,13 @@
   // Pascal Round uses ties-to-even, unlike JavaScript Math.round.
   function round(n) {const f=Math.floor(n);return n-f===0.5 ? (f%2===0?f:f+1) : Math.round(n);}
   const WEAPONS=[null,
-    {name:'SIDEARM',delay:15,damage:5,pellets:1,spread:0.05},
-    {name:'RIFLE',delay:10,damage:4,pellets:1,spread:0.10},
-    {name:'AUTO',delay:3,damage:3,pellets:1,spread:0.20},
-    {name:'ROCKET',delay:50,damage:250,pellets:1,spread:0},
-    {name:'SCATTER',delay:50,damage:7,pellets:10,spread:0.50},
-    {name:'BEAM',delay:2,damage:7,pellets:20,spread:0}
+    {name:'PISTOL',delay:15,damage:5,pellets:1,spread:0.05},
+    {name:'MP-5',delay:10,damage:4,pellets:1,spread:0.10},
+    {name:'MINIGUN',delay:3,damage:3,pellets:1,spread:0.20},
+    {name:'ROCKET LAUNCHER',delay:50,damage:250,pellets:1,spread:0},
+    {name:'SHOTGUN',delay:50,damage:7,pellets:10,spread:0.50},
+    // Root MINKMAIN.PAS counts from 1 to 80: 79 elapsed ticks between shots.
+    {name:'DOUBLE SHOTGUN',delay:79,damage:7,pellets:20,spread:1.0}
   ];
   class Camera {
     constructor(w,h) {this.width=w;this.height=h;this.viewWidth=WIDTH;this.viewHeight=HEIGHT;this.x=0;this.y=0;this.dx=0;this.dy=0;}
@@ -190,7 +191,7 @@
         item.timer=1000;
         if(item.kind===1) {a.health=Math.min(100,a.health+50);if(a.id===0)this.message('+50 HEALTH');}
         else {
-          const w=item.kind-1,amount=[0,20,50,150,10,10,1000][w];
+          const w=item.kind-1,amount=[0,20,50,150,10,10,10][w];
           a.weapons[w]=true;a.ammo[w]+=amount;
           if(a.weapon<w)a.weapon=w;
           if(a.id===0)this.message(`${WEAPONS[w].name} +${amount}`);
