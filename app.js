@@ -2,11 +2,14 @@
   'use strict';
   const {Game,WEAPONS,HZ,clamp}=MinkCore;
   const $=id=>document.getElementById(id);
+  // Uncommitted camera experiment. Add ?scroll=classic for the original camera.
+  const smoothScrolling=new URLSearchParams(location.search).get('scroll')!=='classic';
   const mobile=matchMedia('(hover: none) and (pointer: coarse)').matches||new URLSearchParams(location.search).get('controls')==='touch';
   document.documentElement.classList.toggle('mobile',mobile);
   $('touch-controls').hidden=!mobile;
   const canvas=$('game'),renderer=new MinkRenderer(canvas,MinkAssets);
   let game=new Game(MinkAssets.level,10,101),state='ready',accumulator=0,last=0,uiTick=-1;
+  game.camera.setSmooth(smoothScrolling,game.player);
   const keys=new Set(),mouse={x:160,y:100,down:false,inside:false};
   const sticks={move:{id:null,x:0,y:0,element:$('move-stick')},fire:{id:null,x:0,y:0,element:$('fire-stick')}};
   let fullscreenAttempted=false;
@@ -49,6 +52,7 @@
   function start(){
     const bots=mobile?10:clamp(Number($('bots').value)||10,1,19);
     game=new Game(MinkAssets.level,bots);state='playing';accumulator=0;clearInput();
+    game.camera.setSmooth(smoothScrolling,game.player);
     $('overlay').hidden=true;$('pause').disabled=false;document.body.classList.add('playing');
     if(mobile)resize();else canvas.focus({preventScroll:true});updateUI(true);
   }
@@ -194,6 +198,6 @@
   requestAnimationFrame(frame);
   // Read-only snapshot for troubleshooting; no gameplay/debug controls exposed.
   window.minkSnapshot=()=>({state,mobile,tick:game.tick,viewport:{width:canvas.width,height:canvas.height},
-    camera:{x:game.camera.x,y:game.camera.y},player:{x:game.player.x,y:game.player.y,health:game.player.health,weapon:game.player.weapon,score:game.player.score},
+    camera:{x:game.camera.x,y:game.camera.y,smooth:game.camera.smooth},player:{x:game.player.x,y:game.player.y,health:game.player.health,weapon:game.player.weapon,score:game.player.score},
     bots:game.actors.length-1,rockets:game.rockets.length,effects:game.effects.length});
 })();

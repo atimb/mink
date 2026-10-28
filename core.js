@@ -22,13 +22,15 @@
     {name:'DOUBLE SHOTGUN',delay:79,damage:7,pellets:20,spread:1.0}
   ];
   class Camera {
-    constructor(w,h) {this.width=w;this.height=h;this.viewWidth=WIDTH;this.viewHeight=HEIGHT;this.x=0;this.y=0;this.dx=0;this.dy=0;}
+    constructor(w,h) {this.width=w;this.height=h;this.viewWidth=WIDTH;this.viewHeight=HEIGHT;this.x=0;this.y=0;this.dx=0;this.dy=0;this.smooth=false;}
+    setSmooth(enabled,p) {this.smooth=enabled;this.center(p);}
     setViewport(width,height,p) {
       this.viewWidth=clamp(Math.round(width),1,this.width);
       this.viewHeight=clamp(Math.round(height),1,this.height);
       this.center(p);
     }
     update(p) {
+      if(this.smooth){this.center(p);return;}
       const tx=round((round(p.x)-(this.viewWidth/2-10))/4)*4, ty=round((round(p.y)-(this.viewHeight/2-10))/4)*4;
       if(tx>this.x+28)this.dx=1;
       if(tx<this.x-28)this.dx=-1;
@@ -49,8 +51,9 @@
       this.x=x;this.y=y;
     }
     center(p) {
-      this.x=clamp(round((p.x-(this.viewWidth/2-10))/4)*4,0,Math.max(0,this.width-this.viewWidth));
-      this.y=clamp(round((p.y-(this.viewHeight/2-10))/4)*4,0,Math.max(0,this.height-this.viewHeight));
+      const step=this.smooth?1:4;
+      this.x=clamp(round((p.x-(this.viewWidth/2-10))/step)*step,0,Math.max(0,this.width-this.viewWidth));
+      this.y=clamp(round((p.y-(this.viewHeight/2-10))/step)*step,0,Math.max(0,this.height-this.viewHeight));
       this.dx=this.dy=0;
     }
   }
